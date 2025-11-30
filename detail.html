@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html class="dark" lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Detalle del Horóscopo</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;700;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+<script>
+tailwind.config = {
+    darkMode: "class",
+    theme: {
+        extend: {
+            colors: {
+                "primary": "#7f13ec",
+                "background-light": "#f7f6f8",
+                "background-dark": "#191022",
+            },
+            fontFamily: { "display": ["Be Vietnam Pro"] }
+        },
+    },
+}
+</script>
+
+<style>
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24
+}
+body { min-height: max(884px, 100dvh); }
+</style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col">
+
+<!-- Top App Bar -->
+<div class="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10 border-b border-white/10">
+    <div id="btnBack" class="text-black dark:text-white flex size-12 shrink-0 items-center cursor-pointer">
+        <span class="material-symbols-outlined text-2xl">arrow_back_ios_new</span>
+    </div>
+    <h2 id="signoTitulo" class="text-black dark:text-white text-lg font-bold flex-1 text-center">Signo</h2>
+    <div class="flex w-12 items-center justify-end">
+        <button class="flex cursor-pointer items-center justify-center rounded-xl h-12 bg-transparent text-black dark:text-white">
+            <span class="material-symbols-outlined text-2xl">ios_share</span>
+        </button>
+    </div>
+</div>
+
+<main class="flex-1">
+    <div class="flex p-4 mt-4">
+        <div class="flex w-full flex-col gap-4 items-center">
+            <div class="flex flex-col gap-4 items-center">
+                <div id="signoIcon" class="bg-center bg-no-repeat bg-cover aspect-square rounded-full min-h-32 w-32"></div>
+                <div class="flex flex-col items-center">
+                    <p id="signoNombre" class="text-black dark:text-white text-[22px] font-bold">Signo</p>
+                    <p id="signoRango" class="text-slate-500 dark:text-[#ad92c9]">Rango fechas</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="pb-3 px-4">
+        <div class="flex border-b border-slate-200 dark:border-[#4d3267] justify-between">
+            <a class="flex flex-col items-center justify-center border-b-[3px] border-b-primary text-black dark:text-white pb-[13px] pt-4 flex-1" href="#">
+                <p class="text-sm font-bold">Hoy</p>
+            </a>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="px-4 py-4">
+        <h3 class="text-black dark:text-white text-lg font-bold">Horóscopo de Hoy</h3>
+        <p id="fechaHoy" class="text-slate-500 dark:text-[#ad92c9] text-sm pt-1"></p>
+        <div id="contenidoHoroscopo" class="mt-4 space-y-4">
+            <p class="text-slate-600 dark:text-slate-300">Cargando horóscopo...</p>
+        </div>
+    </div>
+
+    <!-- COMPATIBILIDAD DINÁMICA -->
+    <div class="px-4 py-6">
+        <h3 class="text-black dark:text-white text-lg font-bold mb-4">Compatibilidad</h3>
+        <div id="compatibilidadGrid" class="grid grid-cols-3 gap-4 text-center"></div>
+    </div>
+
+</main>
+</div>
+
+<script>
+const signoSeleccionado =
+    new URLSearchParams(window.location.search).get('signo') ||
+    localStorage.getItem('signoSeleccionado');
+
+document.getElementById('btnBack').addEventListener('click', () => {
+    window.location.href = 'index.html';
+});
+
+async function cargarHoroscopo() {
+
+    try {
+        const res = await fetch(`http://127.0.0.1:8000/api7/horoscopos/${signoSeleccionado}`);
+        const data = await res.json();
+
+        // Info general
+        document.getElementById("signoTitulo").textContent = data.signo;
+        document.getElementById("signoNombre").textContent = data.signo;
+        document.getElementById("signoRango").textContent = data.rango_fecha;
+
+        // Fecha
+        document.getElementById("fechaHoy").textContent =
+            new Date().toLocaleDateString("es-ES", { day: 'numeric', month: 'long', year: 'numeric' });
+
+        // Texto
+        document.getElementById("contenidoHoroscopo").innerHTML =
+            `<p class="text-slate-600 dark:text-white leading-relaxed">${data.texto}</p>`;
+
+        // Icono principal
+        const signoNormalized = data.signo
+            .normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+
+        document.getElementById("signoIcon").style.backgroundImage =
+            `url('icons/${signoNormalized}.png')`;
+
+        // 🔥 COMPATIBILIDAD DINÁMICA (appendChild)
+        const grid = document.getElementById("compatibilidadGrid");
+        grid.innerHTML = ""; // limpiar
+
+        data.compatibles.forEach(signo => {
+            const sNorm = signo
+                .normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+
+            const wrapper = document.createElement("div");
+            wrapper.className = "flex flex-col items-center gap-2";
+
+            wrapper.innerHTML = `
+                <div class="flex items-center justify-center w-16 h-16 rounded-full bg-primary/20">
+                    <img class="w-8 h-8" src="icons/${sNorm}.png" alt="${signo}">
+                </div>
+                <p class="text-slate-600 dark:text-slate-300 text-sm font-medium">
+                    ${signo.charAt(0).toUpperCase() + signo.slice(1)}
+                </p>
+            `;
+
+            grid.appendChild(wrapper);
+        });
+
+    } catch (err) {
+        console.error(err);
+        document.getElementById("contenidoHoroscopo").innerHTML =
+            `<p class="text-red-500">Error al cargar.</p>`;
+    }
+}
+
+cargarHoroscopo();
+</script>
+
+</body>
+</html>
