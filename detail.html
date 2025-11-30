@@ -102,7 +102,7 @@ document.getElementById('btnBack').addEventListener('click', () => {
 async function cargarHoroscopo() {
 
     try {
-        const res = await fetch(`http://127.0.0.1:8000/api7/horoscopos/${signoSeleccionado}`);
+        const res = await fetch(`https://albertaapi.onrender.com/api7/horoscopos/${signoSeleccionado}`);
         const data = await res.json();
 
         // Info general
