@@ -59,22 +59,23 @@
     </header>
 
     <!-- Main Content Grid -->
-    <main class="flex-1 overflow-y-auto p-4">
+    <main class="flex-1 overflow-y-auto p-4 pb-20">
         <div id="signosContainer" class="grid grid-cols-2 gap-4 sm:grid-cols-3">
             <p class="col-span-full text-center text-slate-500 dark:text-slate-400">Cargando signos...</p>
         </div>
     </main>
+   <!-- Transparante  <footer class="fixed bottom-0 left-0 w-full flex gap-2 border-t border-slate-200 bg-white/80 px-4 pb-3 pt-2 dark:border-slate-800 dark:bg-background-dark/80 backdrop-blur-sm z-10"> -->
+   <!-- Bottom Navigation Bar -->
+    <footer class="fixed bottom-0 left-0 w-full flex gap-2 bg-white/95 dark:bg-background-dark/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-4 pb-3 pt-2 z-10">
 
-    <!-- Bottom Navigation Bar -->
-    <footer class="flex shrink-0 gap-2 border-t border-slate-200 bg-white/80 px-4 pb-3 pt-2 dark:border-slate-800 dark:bg-background-dark/80 backdrop-blur-sm sticky bottom-0 z-10">
         <a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-500 dark:text-slate-400" href="#">
             <div class="flex h-8 items-center justify-center">
-                <span class="material-symbols-outlined">spark</span>
+                <img src="icons/logo.png" alt="Horóscopo" class="h-60 w-60 object-contain" />
             </div>
-            <p class="text-xs font-medium tracking-wide">Horóscopo</p>
         </a>
     </footer>
 </div>
+   
 
 <script>
 
@@ -85,7 +86,7 @@ function normalizarSigno(signo) {
         .replace(/[\u0300-\u036f]/g, "") // elimina acentos
         .toLowerCase();         // convierte a minúsculas
 }
-
+//https://albertaapi.onrender.com/api7/horoscopos/
 async function cargarSignos() {
     try {
         const response = await fetch("https://albertaapi.onrender.com/api7/horoscopos/");
